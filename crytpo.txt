@@ -1,0 +1,535 @@
+1. Shift Cipher
+#include <iostream>
+#include <string>
+using namespace std;
+int main() {
+    string msg,encmsg;
+    int key;
+    cout << "Enter the message: ";
+    getline(cin, msg);
+    cout << "Enter key: ";
+    cin >> key;
+    for (int i=0; i<msg.size(); i++){
+        if (msg[i] >= 'a' && msg[i] <= 'z'){
+            encmsg += (msg[i] - 'a' + key) % 26 + 'a';
+        }else if (msg[i] >= 'A' && msg[i] <= 'Z'){
+            encmsg += (msg[i] - 'A' + key) % 26 + 'A';
+        }
+    }
+    cout << "Encrypted message: " << encmsg << endl;
+    return 0;
+}
+
+2. Caesar Cipher
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string msg,encmsg;
+    int key = 3;
+    cout << "Enter the message: ";
+    getline(cin, msg);
+
+    for (int i=0; i<msg.size(); i++){
+        if (msg[i] >= 'a' && msg[i] <= 'z'){
+            encmsg += (msg[i] - 'a' + key) % 26 + 'a';
+        }else if (msg[i] >= 'A' && msg[i] <= 'Z'){
+            encmsg += (msg[i] - 'A' + key) % 26 + 'A';
+        }
+    }
+    cout << "Encrypted message: " << encmsg << endl;
+    return 0;
+}
+
+3.Vigenere Cipher
+#include <iostream>
+#include <string>
+using namespace std;
+void encrypt(string message, string key) {
+    cout << "Enter plaintext: ";
+    cin >> message;
+    cout << "Enter key: ";
+    cin >> key;
+    for (int i = 0; key.size() < message.size(); i++) {
+        key.push_back(key[i]);
+    }
+    string ciphertext;
+    for (int i = 0; i < message.size(); i++) {
+        char x = ((message[i] - 'a' + key[i] - 'a') % 26) + 'a';
+        ciphertext.push_back(x);
+    }
+    cout << endl << "Ciphertext: " << ciphertext << endl << endl;
+}
+int main() {
+    string message;
+    string key;
+    encrypt(message, key);
+    return 0;
+}
+
+4. Play Fair cipher
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <cctype>
+using namespace std;
+string encrypt(string text);
+void createKeyMatrix(string key);
+void findInMatrix(char letter, int &row, int &col);
+string createPairs(string input);
+char keyMatrix[5][5];
+void output() {
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j)
+            cout << keyMatrix[i][j] << " ";
+        cout << "\n";
+    }}
+int main() {
+    string input, key;
+    cout << "Key: ";
+    getline(cin, key);
+    createKeyMatrix(key);
+    output();
+    cout << "Enter message to encrypt: ";
+    getline(cin, input);
+    input = createPairs(input);
+    cout << "Prepared input: " << input << endl;
+    cout << "Encrypted text: " << encrypt(input) << endl;
+    return 0;}
+int mod(int a, int b) {
+    int r = a % b;
+    return r < 0 ? r + b : r;}
+void replace(string &text, int pos, char from, char to) {
+    if (text[pos] == from) text[pos] = to;
+    if (text[pos + 1] == from) text[pos + 1] = to;}
+void findInMatrix(char letter, int &row, int &col) {
+    for (int r = 0; r < 5; ++r)
+        for (int c = 0; c < 5; ++c)
+            if (letter == keyMatrix[r][c]) {
+                row = r;
+                col = c;
+                return;}}
+string encrypt(string text) {
+    string output = "";
+    int row1, col1, row2, col2;
+    int size = text.length();
+    for (int pos = 0; pos < size; pos += 2) {
+        replace(text, pos, 'j', 'i');
+        findInMatrix(text[pos], row1, col1);
+        findInMatrix(text[pos + 1], row2, col2);
+        if (row1 == row2) {
+            output += keyMatrix[row1][mod(col1 + 1, 5)];
+            output += keyMatrix[row2][mod(col2 + 1, 5)];
+        } else if (col1 == col2) {
+            output += keyMatrix[mod(row1 + 1, 5)][col1];
+            output += keyMatrix[mod(row2 + 1, 5)][col2];
+        } else {
+            output += keyMatrix[row1][col2];
+            output += keyMatrix[row2][col1];} }
+    return output;}
+bool found(char c, vector<char> used) {
+    return find(used.begin(), used.end(), c) != used.end();}
+void createKeyMatrix(string key) {
+    vector<char> used;
+    used.push_back('j'); // 'j' is typically merged with 'i' in Playfair cipher
+    int size = key.length();
+    int count = 0;
+    char fillLetter = 'a';
+    for (int row = 0; row < 5; ++row)
+        for (int col = 0; col < 5; ++col) {
+            if (count < size) {
+                char letter = tolower(key[count]);
+                if (!found(letter, used) && isalpha(letter)) {
+                    keyMatrix[row][col] = letter;
+                    used.push_back(letter);
+                } else {
+                    --col;}
+                ++count;
+            } else {
+                if (!found(fillLetter, used) && isalpha(fillLetter)) {
+                    keyMatrix[row][col] = fillLetter;
+                } else {
+                    --col; }
+                ++fillLetter;}}}
+string createPairs(string input) {
+    string newString = "";
+    int size = input.length();
+    for (int i = 0; i < size; ++i) {
+        if (isalpha(input[i])) {
+            newString += tolower(input[i]);
+            if (i + 1 < size && tolower(input[i]) == tolower(input[i + 1])) {
+                newString += 'x';  } }
+    if (newString.length() % 2 != 0) {
+        newString += 'x';
+    }
+    return newString;
+}
+
+ 5. Railfence Cipher
+ #include <iostream>
+#include <string>
+using namespace std;
+int main() {
+    int n;
+    string s;
+    cout << "Enter the message: ";
+    cin >> s;
+    cout << "Enter key (number of rails): ";
+    cin >> n;
+    char a[n][s.length()];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < s.length(); j++) {
+            a[i][j] = ' ';
+        }}
+    int row = 0;
+    bool directionDown = false;
+    for (int i = 0; i < s.length(); i++) {
+        a[row][i] = s[i];
+        if (row == 0 || row == n - 1) {
+            directionDown = !directionDown;
+        }
+        row += directionDown ? 1 : -1;
+    }
+    cout << "Encrypted message: ";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < s.length(); j++) {
+            if (a[i][j] != ' ') {
+                cout << a[i][j];}}}
+    cout << endl;
+    return 0;}
+    
+    6. GCD of two integers
+    #include <iostream>
+using namespace std;
+int gcd(int a, int b) {
+    int r;
+    if (a == 0)
+        return b;
+    if (b == 0)
+        return a;
+    else {
+        while (b != 0) {
+            r = a % b;
+            a = b;
+            b = r;
+        }
+        return a; }}
+int main() {
+    int a, b;
+    cout << "Enter the two numbers: ";
+    cin >> a >> b;
+    cout << "GCD (" << a << ", " << b << ") : " << gcd(a, b) << endl;
+    return 0;
+}
+
+
+7. Write a program to check whether a number is multiplicative inverse of another number or not using brute force approach.
+#include <iostream>
+using namespace std;
+int gcdExtended(int a, int b, int &x, int &y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;  }
+    int x1, y1;
+    int gcd = gcdExtended(b % a, a, x1, y1);
+    x = y1 - (b / a) * x1;
+    y = x1;
+    return gcd;}
+bool isMultiplicativeInverse(int a, int b, int m) {
+    int x, y;
+    int gcd = gcdExtended(a, m, x, y);
+    if (gcd != 1) {
+        return false; // a and m are not coprime, hence no inverse exists }
+    b = ((b % m) + m) % m;
+    return ((a * b) % m == 1);}
+int main() {
+    int a, b, m;
+    cout << "Enter two numbers: ";
+    cin >> a >> b;
+    cout << "Enter the modulus: ";
+    cin >> m;
+
+    if (isMultiplicativeInverse(a, b, m)) {
+        cout << b << " is the multiplicative inverse of " << a << " mod " << m << endl;
+    } else {
+        cout << b << " is not the multiplicative inverse of " << a << " mod " << m << endl;  }
+    return 0;}
+    
+  8. Write a program to compute Totient of a number.
+#include <iostream>
+using namespace std;
+int phi(int n)
+{
+    float result = n;
+    for(int p = 2; p * p <= n; ++p) {
+        if (n % p == 0) {
+            while (n % p == 0)
+                n /= p;
+            result *= (1.0 - (1.0 / (float)p)); }}
+    if (n > 1)
+        result -= result / n;
+    return (int)result;
+}
+int main()
+{
+    int n;
+    cout << "Enter a number: ";
+    cin >> n;
+    cout << "Phi" << "(" << n << ")" << " = " << phi(n) <<endl;
+    return 0;
+}
+  
+  
+  9. Write a program to compute multiplicative inverse of an integer.
+#include <iostream>
+using namespace std;
+int multi(int a, int m) {
+  for (int i = 1; i < m; i++) {
+        if ((a * i) % m == 1) {
+            return i;   }}
+    return 0;
+}
+int main() {
+    int a, m;
+    cout << "Enter the number and the modulus: ";
+    cin >> a >> m;
+    int inverse = multi(a,m);
+    if (inverse > 0) {
+        cout << "The multiplicative inverse is: " << inverse << endl;
+    } else {
+        cout << "The multiplicative inverse doesn't exist." << endl;
+    }
+    return 0;
+}
+
+
+10. Write a program to check whether two numbers are coprime or not
+#include <iostream>
+using namespace std;
+int gcd(int a, int b) {
+    int r;
+    if (a == 0)
+        return b;
+    if (b == 0)
+        return a;
+    else {
+        while (b != 0) {
+            r = a % b;
+            a = b;
+            b = r;
+        }
+        return a;
+    }
+}
+int main() {
+    int a, b;
+    cout << "Enter two numbers: ";
+    cin >> a >> b;
+    if (gcd(a,b) == 1) {
+        cout << a << " and " << b << " are coprime." << endl;
+    }else {
+        cout << a << " and " << b << " are not coprime." << endl;
+    }
+    return 0;
+}
+
+
+
+11. Write a program to implement Extended Euclidean algorithm
+#include <iostream>
+using namespace std;
+int gcd(int a, int b) {
+    int r;
+    if (a == 0)
+        return b;
+    if (b == 0)
+        return a;
+    else {
+        while (b != 0) {
+            r = a % b;
+            a = b;
+            b = r; }
+        return a; }}
+int main() {
+    int a, b;
+    cout << "Enter two numbers: ";
+    cin >> a >> b;
+    if (gcd(a,b) == 1) {
+        cout << a << " and " << b << " are coprime." << endl;
+    }else {
+        cout << a << " and " << b << " are not coprime." << endl;
+    }
+    return 0;
+}
+
+
+12. Write a program to check whether a given number is prime or not.
+#include <iostream>
+using namespace std;
+int main() {
+  int number, count=0;
+  cout << "Enter a number: ";
+  cin >> number;
+  for (int i = 2; i <= number ; i++) {
+    if (number % i == 0)
+      count += 1;
+  }
+  if (count > 2){
+    cout << number << " is not a prime number." << endl;
+  }else {
+    cout << number << " is a prime number." << endl;
+  }
+  return 0;
+}
+
+
+13. Write a program to perform primality checking using Rabin-Miller algorithm.
+#include <iostream>
+#include <math.h>
+#include <stdlib.h>
+using namespace std;
+int modExp(int base, int exp, int mod) {
+    int result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+          result = (result * base) % mod;
+        }
+        exp = exp >> 1;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+int main() {
+  int n,a;
+  cout << "Enter a number: ";
+  cin >> n;
+  cout << "Enter a random integer(<n-1): ";
+  cin >> a;
+  int q = n - 1;
+  int k = 0;
+  while (q % 2 == 0){
+    k++;
+    q /= 2;
+  }
+  if (modExp(a,q,n) == 1){
+    cout << "Inconclusive";
+    exit(0);
+  }
+  for (int j=0; j<= k-1; j++){
+    if (modExp(a,pow(2,j)*q,n) == n-1){
+        cout << "Inconclusive";
+        exit(0);
+    }
+  }
+  cout << "Composite";
+  return 0;
+}
+
+14. Write a program to implement Diffie-Hellman algorithm
+#include <iostream>
+#include <cmath>
+using namespace std;
+int modExp(int base, int exp, int mod) {
+    int result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+          result = (result * base) % mod;}
+        exp = exp >> 1;
+        base = (base * base) % mod; }
+    return result;}
+int main() {
+  int p,g,a,b;
+  cout << "Enter a Prime number(p): ";
+  cin >> p;
+  cout << "Enter a Base number(g): ";
+  cin >> g;
+  cout << "Enter Private Key(a): ";
+  cin >> a;
+  cout << "Enter Private Key(b): ";
+  cin >> b;
+
+  int A = modExp(g,a,p);
+  int B = modExp(g,b,p);
+  cout << "Public Key(A): " << A << endl;
+  cout << "Public Key(B): " << B << endl;
+  int S_A = modExp(B,a,p);
+  int S_B= modExp(A,b,p);
+  cout << "Shared Secret Key(S) of A: " << S_A << endl;
+  cout << "Shared Secret Key(S) of B: " << S_B << endl;
+  if (S_A == S_B) {
+    cout << "Key Exchange is Successful.";
+  }else{
+cout << "Key Exchange is failed."; }
+  return 0;}
+
+15. Write a program to implement perform key exchange and encryption-decryption using RSA algorithm
+#include <iostream>
+#include <string>
+using namespace std;
+int gcd(int a, int b) {
+    int r;
+    if (a == 0)
+        return b;
+    if (b == 0)
+        return a;
+    else {
+        while (b != 0) {
+            r = a % b;
+            a = b;
+            b = r;  }
+        return a;   }}
+int multi(int a, int m) {
+    for (int i = 1; i < m; i++) {
+        if ((a * i) % m == 1) {
+            return i;}}
+    return 0;}
+int modexp(int base, int exp, int mod) {
+    int result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+          result = (result * base) % mod; }
+        exp = exp >> 1;
+        base = (base * base) % mod;}
+    return result;}
+int main() {
+    int p, q, e;
+    cout << "Enter prime numbers p and q: ";
+    cin >> p >> q;
+    cout << "Enter a random integer: ";
+    cin >> e;
+    string character = "#abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    int n = p * q;
+    int phi = (p - 1) * (q - 1);
+    while (e < phi) {
+        if (gcd(e, phi) == 1)
+            break;
+        else
+            e++;  }
+    int d = multi(e, phi);
+    cout << "Public Key: (" << e << ", " << n << ")\n";
+    cout << "Private Key: (" << d << ", " << n << ")\n";
+    cin.ignore(); // Ignore newline character left in buffer
+    string message;
+    cout << "Enter message to encrypt: ";
+    getline(cin, message);
+    int encrypted[message.size()];
+    for (int i = 0; i < message.size(); i++) {
+        int j = character.find(message[i]);
+        encrypted[i] = modexp(j, e, n);   }
+    cout << "Encrypted message: { ";
+    for (int i = 0; i < message.size(); i++) {
+        cout << encrypted[i] << " ";   }
+    cout << "}" << endl;
+    return 0;}
+
+
+
+
+
+
